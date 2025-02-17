@@ -44,7 +44,7 @@ h1, h2, p {
 #game-container {
     display: grid;
     gap: 0;
-    background-image: url(images/background.png);
+    background-image: url('images/background.png');
     background-size: cover;
     background-position: center;
     width: fit-content;
@@ -64,6 +64,11 @@ h1, h2, p {
 }
 
 .wall {
-    background-image: url(images/wall.png);
+    background-image: url('images/wall.png');
+    background-size: cover;
+}
+
+.player {
+    background-image: url('images/player.png');
     background-size: cover;
 }
