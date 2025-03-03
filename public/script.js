@@ -20,6 +20,25 @@ function calculateCellSize() {
   return gameBoardSize / BOARDSIZE
 }
 
+document.addEventListener('keydown', (event) => {
+  switch (event.key) {
+    case 'ArrowDown':
+      player.move(0, 1)
+      break
+    case 'ArrowUp':
+      player.move(0, -1)
+      break
+    case 'ArrowRight':
+      player.move(1, 0)
+      break
+    case 'ArrowLeft':
+      player.move(-1, 0)
+      break
+  }
+  event.preventDefault()
+  drawBoard(gameBoard)
+})
+
 document.getElementById('start-button').addEventListener('click', startGame)
 
 function startGame() {
@@ -30,6 +49,13 @@ function startGame() {
   drawBoard(gameBoard)
 }
 
+function generateObstacles() {
+  const obstacles = [
+    [[0,0],[1,0],[0,1],[1,1]], // square
+    [[0,0],[0,1],[0,2],[0,3]] // I
+  ]
+}
+
 function generateRandomBoard() {
   const newBoard = Array.from({ length: BOARDSIZE }, () => Array(BOARDSIZE).fill(' '))
   for (let y = 0; y < BOARDSIZE; y++) {
@@ -38,12 +64,14 @@ function generateRandomBoard() {
       setCell(newBoard, x, y, 'W')
     }
   }
-  setCell(newBoard, 6, 4, 'P')
+  player = new Player(6, 4)
+  setCell(newBoard, player.x, player.y, 'P')
   return newBoard
 }
 
 function drawBoard(board) {
   const gameContainer = document.getElementById('game-container')
+  gameContainer.innerHTML = ''
   gameContainer.style.gridTemplateColumns = `repeat(${BOARDSIZE}, 1fr)`
 
   const cellSize = calculateCellSize()
@@ -75,11 +103,12 @@ class Player {
 
     const newX = currentX + dx
     const newY = currentY + dy
+    if (getCell(gameBoard, newX, newY) === ' ') {
+      this.x = newX
+      this.y = newY
 
-    this.x = newX
-    this.y = newY
-
-    setCell(gameBoard, currentX, currentY, ' ')
-    setCell(gameBoard, this.x, this.y, 'P')
+      setCell(gameBoard, currentX, currentY, ' ')
+      setCell(gameBoard, this.x, this.y, 'P')
+    }
   }
 }
