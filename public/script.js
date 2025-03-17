@@ -5,6 +5,7 @@ const BOARDSIZE = 15
 
 let gameBoard
 let player
+let monsters
 
 function randomInt(min, max) {
   const randomFloat = Math.random() * (max - min) + min
@@ -45,6 +46,18 @@ document.addEventListener('keydown', (event) => {
       break
     case 'ArrowLeft':
       player.move(-1, 0)
+      break
+    case 'w':
+      shootAt(player.x, player.y - 1)
+      break
+    case 's':
+      shootAt(player.x, player.y + 1)
+      break
+    case 'a':
+      shootAt(player.x - 1, player.y)
+      break
+    case 'd':
+      shootAt(player.x + 1, player.y)
       break
   }
   event.preventDefault()
@@ -95,6 +108,12 @@ function generateRandomBoard() {
     }
   }
   generateObstacles(newBoard)
+  monsters = []
+  for (let i = 0; i < 5; i++) {
+    const [monsterX, monsterY] = randomEmptyPosition(newBoard)
+    monsters.push(new Monster(monsterX, monsterY))
+    setCell(newBoard, monsterX, monsterY, 'M')
+  }
   const [playerX, playerY] = randomEmptyPosition(newBoard)
   player = new Player(playerX, playerY)
   setCell(newBoard, player.x, player.y, 'P')
@@ -116,8 +135,12 @@ function drawBoard(board) {
       cell.style.height = cellSize + 'px'
       if (getCell(board, x, y) === 'W')
         cell.classList.add('wall')
+      else if (getCell(board, x, y) === 'M')
+        cell.classList.add('monster')
       else if (getCell(board, x, y) === 'P')
         cell.classList.add('player')
+      else if (getCell(board, x, y) === 'B')
+        cell.classList.add('bullet')
       gameContainer.appendChild(cell)
     }
   }
@@ -143,4 +166,17 @@ class Player {
       setCell(gameBoard, this.x, this.y, 'P')
     }
   }
+}
+
+class Monster {
+  constructor (x, y) {
+    this.x = x
+    this.y = y
+  }
+}
+
+function shootAt(x, y) {
+  setCell(gameBoard, x, y, 'B')
+  setTimeout(() => setCell(gameBoard, x, y, ' '), 500)
+  drawBoard(gameBoard)
 }
