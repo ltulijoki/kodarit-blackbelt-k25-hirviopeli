@@ -3,10 +3,13 @@ const gameScreen = document.getElementById('game-screen')
 
 const BOARDSIZE = 15
 
+let gameRunning = false
+
 let gameBoard
 let player
 let monsters
 let monsterMoveInterval
+let monsterSpeed
 
 function randomInt(min, max) {
   const randomFloat = Math.random() * (max - min) + min
@@ -35,34 +38,36 @@ function calculateCellSize() {
 }
 
 document.addEventListener('keydown', (event) => {
-  switch (event.key) {
-    case 'ArrowDown':
-      player.move(0, 1)
-      break
-    case 'ArrowUp':
-      player.move(0, -1)
-      break
-    case 'ArrowRight':
-      player.move(1, 0)
-      break
-    case 'ArrowLeft':
-      player.move(-1, 0)
-      break
-    case 'w':
-      shootAt(player.x, player.y - 1)
-      break
-    case 's':
-      shootAt(player.x, player.y + 1)
-      break
-    case 'a':
-      shootAt(player.x - 1, player.y)
-      break
-    case 'd':
-      shootAt(player.x + 1, player.y)
-      break
+  if (gameRunning) {
+    switch (event.key) {
+      case 'ArrowDown':
+        player.move(0, 1)
+        break
+      case 'ArrowUp':
+        player.move(0, -1)
+        break
+      case 'ArrowRight':
+        player.move(1, 0)
+        break
+      case 'ArrowLeft':
+        player.move(-1, 0)
+        break
+      case 'w':
+        shootAt(player.x, player.y - 1)
+        break
+      case 's':
+        shootAt(player.x, player.y + 1)
+        break
+      case 'a':
+        shootAt(player.x - 1, player.y)
+        break
+      case 'd':
+        shootAt(player.x + 1, player.y)
+        break
+    }
+    event.preventDefault()
+    drawBoard(gameBoard)
   }
-  event.preventDefault()
-  drawBoard(gameBoard)
 })
 
 document.getElementById('start-button').addEventListener('click', startGame)
@@ -70,14 +75,26 @@ document.getElementById('start-button').addEventListener('click', startGame)
 function startGame() {
   startScreen.style.display = 'none'
   gameScreen.style.display = 'block'
+  gameRunning = true
   gameBoard = generateRandomBoard()
-  monsterMoveInterval = setInterval(moveMonsters, 1000)
-  console.log(gameBoard)
+  monsterSpeed = 1000
+  monsterMoveInterval = setInterval(moveMonsters, monsterSpeed)
+  drawBoard(gameBoard)
+}
+
+function nextLevel() {
+  alert('Next level')
+  clearInterval(monsterMoveInterval)
+  gameBoard = generateRandomBoard()
+  monsterSpeed *= 0.9
+  monsterMoveInterval = setInterval(moveMonsters, monsterSpeed)
   drawBoard(gameBoard)
 }
 
 function endGame() {
+  gameRunning = false
   clearInterval(monsterMoveInterval)
+  alert('Kuolit ja peli loppui')
   gameScreen.style.display = 'none'
   startScreen.style.display = 'block'
 }
@@ -180,11 +197,11 @@ class Monster {
   constructor (x, y) {
     this.x = x
     this.y = y
+    this.isAlive = true
   }
 }
 
 function moveMonsters() {
-  let hitIndices = []
   for (const monster of monsters) {
     const moves = [
       { x: monster.x + 1, y: monster.y },
@@ -206,16 +223,16 @@ function moveMonsters() {
       monster.y = nextPosition.y
       if (getCell(gameBoard, monster.x, monster.y) === 'P')
         endGame()
-      else if (getCell(gameBoard, monster.x, monster.y) === 'B') {
-        const monsterIndex = monsters.indexOf(monster)
-        hitIndices.push(monsterIndex)
-      } else
+      else if (getCell(gameBoard, monster.x, monster.y) === 'B')
+        monster.isAlive = false
+      else
         setCell(gameBoard, monster.x, monster.y, 'M')
     }
   }
-  for (const j of hitIndices)
-    monsters.splice(i, 1)
+  monsters = monsters.filter(monster => monster.isAlive)
   drawBoard(gameBoard)
+  if (monsters.length === 0)
+    nextLevel()
 }
 
 function shootAt(x, y) {
@@ -228,6 +245,4 @@ function shootAt(x, y) {
   setCell(gameBoard, x, y, 'B')
   setTimeout(() => setCell(gameBoard, x, y, ' '), 500)
   drawBoard(gameBoard)
-  if (monsters.length === 0)
-    alert('hirviöt loppu')
 }
