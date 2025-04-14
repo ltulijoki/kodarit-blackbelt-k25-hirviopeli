@@ -1,5 +1,6 @@
 const startScreen = document.getElementById('start-screen')
 const gameScreen = document.getElementById('game-screen')
+const scoreBoard = document.getElementById('score-board')
 
 const BOARDSIZE = 15
 
@@ -10,6 +11,7 @@ let player
 let monsters
 let monsterMoveInterval
 let monsterSpeed
+let score
 
 function randomInt(min, max) {
   const randomFloat = Math.random() * (max - min) + min
@@ -76,6 +78,8 @@ function startGame() {
   startScreen.style.display = 'none'
   gameScreen.style.display = 'block'
   gameRunning = true
+  score = 0
+  scoreBoard.textContent = 'SCORE: ' + score
   gameBoard = generateRandomBoard()
   monsterSpeed = 1000
   monsterMoveInterval = setInterval(moveMonsters, monsterSpeed)
@@ -223,9 +227,11 @@ function moveMonsters() {
       monster.y = nextPosition.y
       if (getCell(gameBoard, monster.x, monster.y) === 'P')
         endGame()
-      else if (getCell(gameBoard, monster.x, monster.y) === 'B')
+      else if (getCell(gameBoard, monster.x, monster.y) === 'B') {
+        score++
+        scoreBoard.textContent = 'SCORE: ' + score
         monster.isAlive = false
-      else
+      } else
         setCell(gameBoard, monster.x, monster.y, 'M')
     }
   }
@@ -240,6 +246,8 @@ function shootAt(x, y) {
     return
   if (getCell(gameBoard, x, y) === 'M') {
     const monsterIndex = monsters.findIndex(m => m.x === x && m.y === y)
+    score++
+    scoreBoard.textContent = 'SCORE: ' + score
     monsters.splice(monsterIndex, 1)
   }
   setCell(gameBoard, x, y, 'B')
