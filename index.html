@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hirviöpeli 2025</title>
     <link rel="stylesheet" href="style.css" />
+    <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore-compat.js"></script>
     <script src="script.js" defer></script>
 </head>
 <body>
@@ -16,6 +18,13 @@
     <div id="game-screen">
         <div id="score-board">SCORE: 1000000</div>
         <div id="game-container"></div>
+    </div>
+    <div id="game-over-screen">
+        <h1>Pelisi on ohi</h1>
+        <p>Haluatko tallentaa pisteesi</p>
+        <input type="text" id="player-name" placeholder="Nimesi">
+        <button id="save-scores-btn">Kyllä</button>
+        <button id="exit-btn">Ei</button>
     </div>
 </body>
 </html>

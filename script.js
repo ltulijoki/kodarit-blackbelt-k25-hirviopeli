@@ -1,6 +1,20 @@
 const startScreen = document.getElementById('start-screen')
 const gameScreen = document.getElementById('game-screen')
+const gameOverScreen = document.getElementById('game-over-screen')
 const scoreBoard = document.getElementById('score-board')
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAk7dNHJHBmqsOZ8CeJHvEAgjqsWbvkmdQ",
+  authDomain: "monstergame-22e2b.firebaseapp.com",
+  projectId: "monstergame-22e2b",
+  storageBucket: "monstergame-22e2b.firebasestorage.app",
+  messagingSenderId: "819356303708",
+  appId: "1:819356303708:web:0c5172893aa04819818199",
+  measurementId: "G-BHXC8ZC15H"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
 
 const BOARDSIZE = 15
 
@@ -100,9 +114,15 @@ function nextLevel() {
 function endGame() {
   gameRunning = false
   clearInterval(monsterMoveInterval)
-  alert('Kuolit ja peli loppui')
-  gameScreen.style.display = 'none'
-  startScreen.style.display = 'block'
+  gameOverScreen.style.display = 'block'
+}
+
+function saveScore() {
+  const playerName = document.getElementById('player-name')
+  if (playerName.trim() === '') {
+    alert('Anna nimesi!!!')
+    return
+  }
 }
 
 function generateObstacles(board) {
