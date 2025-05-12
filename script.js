@@ -16,6 +16,8 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
+showTopTen()
+
 const BOARDSIZE = 15
 
 let gameRunning = false
@@ -87,6 +89,8 @@ document.addEventListener('keydown', (event) => {
 })
 
 document.getElementById('start-button').addEventListener('click', startGame)
+document.getElementById('save-score-button').addEventListener('click', saveScore)
+document.getElementById('exit-button').addEventListener('click', exitGame)
 
 function startGame() {
   startScreen.style.display = 'none'
@@ -118,11 +122,44 @@ function endGame() {
 }
 
 function saveScore() {
-  const playerName = document.getElementById('player-name')
+  const playerName = document.getElementById('player-name').value
   if (playerName.trim() === '') {
     alert('Anna nimesi!!!')
     return
   }
+  db.collection('hp-scores').add({
+    name: playerName,
+    score,
+    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+  })
+  exitGame()
+}
+
+function exitGame() {
+  startScreen.style.display = 'block'
+  gameScreen.style.display = 'none'
+  gameOverScreen.style.display = 'none'
+  showTopTen()
+}
+
+function showTopTen() {
+  db.collection('hp-scores')
+    .orderBy('score', 'desc')
+    .limit(10)
+    .get()
+    .then(snapshot => {
+      const container = document.getElementById('top-ten-scores')
+      container.innerHTML = ''
+      const scoreList = document.createElement('ol')
+      snapshot.forEach(doc => {
+        const data = doc.data()
+        const scoreEntry = document.createElement('li')
+        console.log(typeof data)
+        scoreEntry.textContent = `${data.name}: ${data.score}`
+        scoreList.appendChild(scoreEntry)
+      })
+      container.appendChild(scoreList)
+    })
 }
 
 function generateObstacles(board) {
